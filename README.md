@@ -15,6 +15,7 @@ A minimal starter template for writing plain Java applications. Ideal for learni
 -  :pen: VS Code settings included
 -  :gear: No dependency management tool like Maven or Gradle, so fast startup and zero build overhead
 -  :memo: `make` targets for easily compiling, packaging, and running the application
+-  :vertical_traffic_light: GitHub Actions for CI/CD
 
 ## :rocket: Getting started
 

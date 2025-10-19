@@ -1,0 +1,61 @@
+---
+name: Build
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          architecture: x64
+
+      - name: Detect Main Class
+        id: detect-main
+        run: |
+          MAIN_FILE=$(grep -rl "public class Main" src | head -n1)
+          if [ -z "$MAIN_FILE" ]; then
+            echo "[ERROR]: Main.java not found"
+            exit 1
+          fi
+
+          PKG=$(grep "package " "$MAIN_FILE" | awk '{print $2}' | tr -d ';')
+          if [ -n "$PKG" ]; then
+            MAIN_CLASS="$PKG.Main"
+          else
+            MAIN_CLASS="Main"
+          fi
+
+          echo "MAIN_CLASS=$MAIN_CLASS" >> $GITHUB_ENV
+
+      - name: Build JAR
+        run: |
+          javac -d bin -cp "lib/*" $(find src -name "*.java");
+          jar --create --file dist/app.jar --main-class="${MAIN_CLASS}" -C bin/ .
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar-${{ github.sha }}
+          path: dist/app.jar
+          retention-days: 7
+          if-no-files-found: error
