@@ -6,6 +6,7 @@
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "extensions.ignoreRecommendations": true,
+  "chat.disableAIFeatures": true,
   "java.project.sourcePaths": ["src"],
   "java.project.outputPath": "bin",
   "java.project.referencedLibraries": ["lib/**/*.jar"],
